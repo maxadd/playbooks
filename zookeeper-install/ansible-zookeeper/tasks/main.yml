@@ -1,0 +1,80 @@
+---
+- name: Create zookeeper group
+  group:
+    name: '{{ zookeeper_group }}'
+    state: present
+    gid: '{{ zookeeper_gorup_id }}'
+  when: zookeeper_create_user_group | bool
+  tags:
+    - zookeeper_group
+
+- name: Create zookeeper user
+  user:
+    name: '{{ zookeeper_user }}'
+    group: '{{ zookeeper_group }}'
+    state: present
+    uid: '{{ zookeeper_user_id }}'
+    shell: /sbin/nologin
+    createhome: no
+  when: zookeeper_create_user | bool
+  tags:
+    - zookeeper_user
+
+- name: Download Apache Zookeeper
+  get_url:
+    url: "{{ zookeeper_download_base_url }}/zookeeper-{{ version }}.tar.gz"
+    dest: /tmp
+  tags:
+    - zookeeper_download
+
+- name: Unpack Apache Zookeeper
+  unarchive:
+    src: /tmp/zookeeper-{{ version }}.tar.gz
+    dest: '{{ zookeeper_root_dir }}'
+    copy: no
+    group: '{{ zookeeper_group }}'
+    owner: '{{ zookeeper_user }}'
+  tags:
+    - zookeeper_unpack
+
+- name: Create symlink to zookeeper installation directory
+  file:
+    src: '{{ zookeeper_root_dir }}/zookeeper-{{ version }}'
+    dest: '{{ zookeeper_dir }}'
+    state: link
+    group: '{{ zookeeper_group }}'
+    owner: '{{ zookeeper_user }}'
+  tags:
+    - zookeeper_dirs
+
+- name: Create directory for zookeeper data log files
+  file:
+    path: '{{ zookeeper_data_dir }}'
+    state: directory
+    group: '{{ zookeeper_group }}'
+    owner: '{{ zookeeper_user }}'
+    mode: 0755
+  tags:
+    - zookeeper_dirs
+
+- name: Overwrite myid file
+  template: 
+    src: myid.j2
+    dest: '{{ zookeeper_data_dir }}/myid'
+  tags: deploy
+
+- name: Template zookeeper systemd service
+  template:
+    src: zookeeper.service.j2
+    dest: /etc/systemd/system/zookeeper.service
+  # notify:
+  #   - Restart zookeeper systemd
+  tags:
+    - restart
+
+- name: Overwrite default config file
+  template: 
+    src: zoo.cfg.j2
+    dest: '{{ zookeeper_dir }}/conf/zoo.cfg'
+  notify: Restart zookeeper systemd
+  tags: config

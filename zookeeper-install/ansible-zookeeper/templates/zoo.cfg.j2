@@ -1,0 +1,9 @@
+tickTime={{tick_time}}
+dataDir={{zookeeper_data_dir}}
+clientPort={{client_port}}
+initLimit={{init_limit}}
+syncLimit={{sync_limit}}
+
+{% for host, value in hostvars.items() %}
+server.{{value.myid}}={{host}}:2888:3888
+{% endfor %}

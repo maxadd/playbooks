@@ -1,0 +1,13 @@
+all:
+  hosts:
+    192.168.16.16:
+      kafka_listeners: ["PLAINTEXT://kafka-01:9092"]
+      kafka_broker_id: 0
+    192.168.16.53:
+      kafka_listeners: ["PLAINTEXT://kafka-02:9092"]
+      kafka_broker_id: 1
+    192.168.16.52:
+      kafka_listeners: ["PLAINTEXT://kafka-03:9092"]
+      kafka_broker_id: 2
+  vars:
+    kafka_zookeeper_connect: 192.168.16.16:2181,192.168.16.53:2181,192.168.16.52:2181

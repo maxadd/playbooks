@@ -1,0 +1,19 @@
+---
+zookeeper_create_user_group: true
+zookeeper_group: zookeeper
+zookeeper_gorup_id: 1055
+zookeeper_create_user: true
+zookeeper_user: zookeeper
+zookeeper_user_id: 1055
+zookeeper_download_base_url: 
+zookeeper_root_dir: /opt
+zookeeper_dir: "{{ zookeeper_root_dir }}/zookeeper"
+zookeeper_data_dir: /data/zookeeper
+zookeeper_log_dir: "{{ zookeeper_dir }}/log"
+zookeeper_restart: yes
+version: 3.4.12
+client_port: 2181
+init_limit: 5
+sync_limit: 2
+tick_time: 2000
+myid: 1
